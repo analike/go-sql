@@ -17,6 +17,15 @@ type Filter struct {
 	filters    []string
 }
 
+// AddParam add to the param stack and returns the placeholder text for
+// the given value.
+//
+// Useful in advance query cases where reusing a particular param is necessary.
+func (f *Filter) AddParam(value any) string {
+	f.params = append(f.params, value)
+	return f.incrementCounter().getPlaceholder()
+}
+
 func (f *Filter) WithFilter(field string, value any) *Filter {
 	f.filters = append(
 		f.filters,
@@ -68,6 +77,11 @@ func (f *Filter) WithFilterOperatorReversed(field string, value any, operator st
 		),
 	)
 	f.params = append(f.params, value)
+	return f
+}
+
+func (f *Filter) WithRawFilter(filter string) *Filter {
+	f.filters = append(f.filters, filter)
 	return f
 }
 
